@@ -1,7 +1,8 @@
 from django.shortcuts import render
+from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from . models import userProfile 
+from .models import userProfile
 from . import serialize
 from rest_framework import status
 # Create your views here.
@@ -30,3 +31,34 @@ class HelloApi(APIView):
 
     def delete(self,request,pk = None):
         return Response({'message':'delete'})
+
+class HelloViewset(viewsets.ViewSet):
+    serializer_class = serialize.HelloSerializer
+    def list(self,request):
+        a_list = ['viewset item list','uses action (list, create, update, retrieve, partial update) ']
+        return Response({"message":a_list})
+
+    def create(self,request):
+        serializer = serialize.HelloSerializer(data = request.data)
+        if serializer.is_valid():
+            name = serializer.data.get('name')
+            message = 'Hello {0}'.format(name)
+            return Response({"message":message})
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def update(self,request,pk =None):
+        return Response({'http_method':'Put'})
+
+    def retrieve(self,request,pk =None):
+        return Response({'http_method':'Get'})
+
+    def partial_update(self,request,pk =None):
+        return Response({'http_method':'Patch'})
+        
+    def destroy(self,request,pk = None):
+        return Response({'http_method':'Delete'})
+    
+class userProfileViewSet(viewsets.ModelViewSet):
+    serializer_class = serialize.userProfileSerializer
+    queryset = userProfile.objects.all()
