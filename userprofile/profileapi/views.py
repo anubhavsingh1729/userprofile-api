@@ -9,7 +9,7 @@ from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework.authtoken.views import ObtainAuthToken
 
 from . import permission
-from .models import userProfile
+from .models import userProfile,ProfileFeedItem
 from . import serialize
 # Create your views here.
 
@@ -78,3 +78,12 @@ class LoginViewSet(viewsets.ViewSet):
 
     def create(self,request):
         return ObtainAuthToken().post(request)
+
+class ProfileFeedItemView(viewsets.ModelViewSet):
+    serializer_class = serialize.ProfileFeedSerializer
+    authentication_classes = (TokenAuthentication,)
+    queryset = ProfileFeedItem.objects.all()
+
+    def create(self,serializer):
+        serializer.save(user_profile=self.request.user)
+
