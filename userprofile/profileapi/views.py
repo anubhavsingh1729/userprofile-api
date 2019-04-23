@@ -2,12 +2,15 @@ from django.shortcuts import render
 from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import userProfile
-from . import serialize
 from rest_framework import status
-from . import permission
 from rest_framework.authentication import TokenAuthentication
 from rest_framework import filters
+from rest_framework.authtoken.serializers import AuthTokenSerializer
+from rest_framework.authtoken.views import ObtainAuthToken
+
+from . import permission
+from .models import userProfile
+from . import serialize
 # Create your views here.
 
 class HelloApi(APIView):
@@ -69,3 +72,9 @@ class userProfileViewSet(viewsets.ModelViewSet):
     authentication_classes = (TokenAuthentication,)
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name','email')
+
+class LoginViewSet(viewsets.ViewSet):
+    serializer_class = AuthTokenSerializer
+
+    def create(self,request):
+        return ObtainAuthToken().post(request)
