@@ -7,6 +7,7 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework import filters
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.permissions import IsAuthenticated
 
 from . import permission
 from .models import userProfile,ProfileFeedItem
@@ -79,11 +80,11 @@ class LoginViewSet(viewsets.ViewSet):
     def create(self,request):
         return ObtainAuthToken().post(request)
 
-class ProfileFeedItemView(viewsets.ModelViewSet):
-    serializer_class = serialize.ProfileFeedSerializer
+class ProfileFeedViewSet(viewsets.ModelViewSet):
     authentication_classes = (TokenAuthentication,)
+    serializer_class = serialize.ProfileFeedSerializer
     queryset = ProfileFeedItem.objects.all()
+    permission_classes = (permission.UpdateOwnFeed,IsAuthenticated)
 
-    def create(self,serializer):
+    def perform_create(self,serializer):
         serializer.save(user_profile=self.request.user)
-
